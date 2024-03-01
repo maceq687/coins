@@ -2,29 +2,44 @@ import { useState } from "react";
 import "./App.css";
 
 function App() {
-  const coins: number[] = [1, 2, 5];
+  const [coinsArr, setCoins] = useState([1, 2, 5]);
   // 1 5 7 : 10
-  // 2 5 7 : 11
-  const [state, setState] = useState(11);
+  // 2 3 5 : 9
+  const coins = coinsArr.join(",");
+  const [valueToCalculate, setValueToCalculate] = useState(11);
   const coinsResult: string[] = [];
+  let result: string = "";
   let counting = true;
 
-  const updateCoinValue = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setState(parseInt(event.target.value));
-    coins.sort(function (a, b) {
+  const updateValueToCalculate = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setValueToCalculate(parseInt(event.target.value));
+  };
+
+  const updateCoins = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const coinsArr = event.target.value.split(",").map(function (str) {
+      return parseInt(str);
+    });
+    setCoins(coinsArr);
+  };
+
+  function calculate() {
+    let value = valueToCalculate;
+    coinsArr.sort(function (a, b) {
       return a - b;
     });
-    let remainingValue = state;
-    const coinsOrdered: number[] = coins.reverse();
+    const coinsOrdered: number[] = coinsArr.reverse();
     while (counting) {
       const biggestDivider: number = findBiggestDivider(
-        remainingValue,
+        value,
         coinsOrdered
       ) as number;
-      remainingValue = divideByBD(remainingValue, biggestDivider) as number;
+      value = divideByBiggestDivider(value, biggestDivider) as number;
     }
-    console.log(coinsResult);
-  };
+    result = coinsResult.join(", ");
+    console.log(result);
+  }
 
   function findBiggestDivider(value: number, arr: number[]) {
     for (let i = 0; i < arr.length; i++) {
@@ -32,7 +47,7 @@ function App() {
     }
   }
 
-  function divideByBD(value: number, divider: number) {
+  function divideByBiggestDivider(value: number, divider: number) {
     let result = value / divider;
     result = Math.floor(result);
     coinsResult.push(divider + "*" + result);
@@ -47,13 +62,18 @@ function App() {
     <>
       <h1>Coins</h1>
       <div className="card">
+        <p>Coins values</p>
+        <input type="string" value={coins} onChange={updateCoins} />
+        <br />
+        <p>Value to calculate</p>
         <input
-          type="string"
-          value={state}
-          onChange={updateCoinValue}
-          autoFocus
-        ></input>
+          type="number"
+          value={valueToCalculate}
+          onChange={updateValueToCalculate}
+        />
       </div>
+      <button onClick={calculate}>Run</button>
+      {!counting && <div>Result: {result}</div>}
     </>
   );
 }
