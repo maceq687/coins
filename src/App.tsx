@@ -1,11 +1,14 @@
 import { useState } from "react";
 import "./App.css";
 
+const regexCoins = /^(\d+(,(\d+)*)*)?$/;
+
 function App() {
-  const [coinsArr, setCoins] = useState([1, 2, 5]);
+  const coinsArr = [1, 2, 5];
   // 1 5 7 : 10
   // 2 3 5 : 9
-  const coins = coinsArr.join(",");
+  const [coins, setCoins] = useState(coinsArr.join(","));
+  const [coinsProblem, setCoinsProblem] = useState(false);
   const [valueToCalculate, setValueToCalculate] = useState(11);
   const coinsResult: string[] = [];
   let result: string = "";
@@ -18,14 +21,17 @@ function App() {
   };
 
   const updateCoins = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const coinsArr = event.target.value.split(",").map(function (str) {
-      return parseInt(str);
-    });
-    setCoins(coinsArr);
+    if (regexCoins.test(event.target.value)) {
+      setCoinsProblem(false);
+      setCoins(event.target.value);
+    } else setCoinsProblem(true);
   };
 
   function calculate() {
     let value = valueToCalculate;
+    const coinsArr = coins.split(",").map(function (str) {
+      return parseInt(str);
+    });
     coinsArr.sort(function (a, b) {
       return a - b;
     });
@@ -63,6 +69,7 @@ function App() {
       <h1>Coins</h1>
       <div className="card">
         <p>Coins values</p>
+        {coinsProblem && <div>Invalid coins</div>}
         <input type="string" value={coins} onChange={updateCoins} />
         <br />
         <p>Value to calculate</p>
