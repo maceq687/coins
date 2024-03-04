@@ -3,7 +3,7 @@
 ### Coins web app
 
 Purpose of the application is to return a smallest amount of coins (with defined denominations) that will sum up to a defined value.  
-See live demo here: [maceq687.github.io/coins/](https://maceq687.github.io/coins/)
+See live demo here: [maceq687.github.io/coins/](https://maceq687.github.io/coins/)  
 See [change-making problem on wikipedia](https://en.wikipedia.org/wiki/Change-making_problem)
 
 ## Project Setup
