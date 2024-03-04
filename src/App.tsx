@@ -10,9 +10,11 @@ function App() {
   const [coins, setCoins] = useState(coinsArr.join(","));
   const [coinsProblem, setCoinsProblem] = useState(false);
   const [valueToCalculate, setValueToCalculate] = useState(11);
-  const coinsResult: string[] = [];
-  let result: string = "";
+  let coinsCount = 0;
+  let coinsResult: string[] = [];
+  const [result, setResult] = useState("");
   let counting = true;
+  const [displayResult, setDisplayResult] = useState(false);
 
   const updateValueToCalculate = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -43,8 +45,7 @@ function App() {
       ) as number;
       value = divideByBiggestDivider(value, biggestDivider) as number;
     }
-    result = coinsResult.join(", ");
-    console.log(result);
+    setResult(coinsCount + " coins: " + coinsResult.join(", "));
   }
 
   function findBiggestDivider(value: number, arr: number[]) {
@@ -54,13 +55,15 @@ function App() {
   }
 
   function divideByBiggestDivider(value: number, divider: number) {
-    let result = value / divider;
-    result = Math.floor(result);
-    coinsResult.push(divider + "*" + result);
-    result = value - divider * result;
-    if (result > 0) return result;
+    let reminder = value / divider;
+    reminder = Math.floor(reminder);
+    coinsCount = coinsCount + reminder;
+    coinsResult = [...coinsResult, reminder + "x " + divider];
+    reminder = value - divider * reminder;
+    if (reminder > 0) return reminder;
     else {
       counting = false;
+      setDisplayResult(true);
     }
   }
 
@@ -69,7 +72,7 @@ function App() {
       <h1>Coins</h1>
       <div className="card">
         <p>Coins values</p>
-        {coinsProblem && <div>Invalid coins</div>}
+        {coinsProblem && <div className="err">Invalid coins</div>}
         <input type="string" value={coins} onChange={updateCoins} />
         <br />
         <p>Value to calculate</p>
@@ -80,7 +83,12 @@ function App() {
         />
       </div>
       <button onClick={calculate}>Run</button>
-      {!counting && <div>Result: {result}</div>}
+      {displayResult && (
+        <p>
+          Result: <br />
+          {result}
+        </p>
+      )}
     </>
   );
 }
