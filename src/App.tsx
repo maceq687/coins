@@ -4,14 +4,15 @@ import "./App.css";
 const regexCoins = /^(\d+(,(\d+)*)*)?$/;
 
 function App() {
-  const coinsArr = [1, 2, 5];
+  const coinsArr = [3, 2, 5];
   // 1 5 7 : 10
   // 2 3 5 : 9
   const [coins, setCoins] = useState(coinsArr.join(","));
   const [coinsProblem, setCoinsProblem] = useState(false);
-  const [valueToCalculate, setValueToCalculate] = useState(11);
+  const [valueToCalculate, setValueToCalculate] = useState(9);
   let coinsCount = 0;
   let coinsResult: string[] = [];
+  let lastIndex = 0;
   let possibleResults: Result[] = [];
   let smallestCoinCount: Result;
   const [result, setResult] = useState("");
@@ -43,9 +44,15 @@ function App() {
     const coinsOrdered: number[] = coinsFiltered.reverse();
     while (counting) {
       let divider = 0;
+      if (coinsOrdered.every((el) => el > value)) {
+        value = value + coinsOrdered[lastIndex];
+        coinsResult.pop();
+        coinsOrdered.splice(lastIndex, 1);
+      }
       for (let i = 0; i < coinsOrdered.length; i++) {
         if (value >= coinsOrdered[i]) {
           divider = coinsOrdered[i];
+          lastIndex = i;
           break;
         }
       }
