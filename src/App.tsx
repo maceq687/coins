@@ -10,10 +10,6 @@ function App() {
   const [coins, setCoins] = useState(coinsArr.join(","));
   const [coinsProblem, setCoinsProblem] = useState(false);
   const [valueToCalculate, setValueToCalculate] = useState(9);
-  let coinsCount = 0;
-  let coinsResult: string[] = [];
-  let lastIndex = 0;
-  let possibleResults: Result[] = [];
   let smallestCoinCount: Result;
   const [result, setResult] = useState("");
   let counting = true;
@@ -34,6 +30,10 @@ function App() {
 
   function calculate() {
     let value = valueToCalculate;
+    let coinsCount = 0;
+    let coinsResult: string[] = [];
+    let lastIndex = 0;
+    let possibleResults: Result[] = [];
     const coinsArr = coins.split(",").map(function (str) {
       return parseInt(str);
     });
@@ -46,6 +46,7 @@ function App() {
       let divider = 0;
       if (coinsOrdered.every((el) => el > value)) {
         value = value + coinsOrdered[lastIndex];
+        coinsCount = coinsCount - Math.floor(value / coinsOrdered[lastIndex]);
         coinsResult.pop();
         coinsOrdered.splice(lastIndex, 1);
       }
@@ -56,10 +57,10 @@ function App() {
           break;
         }
       }
-      let reminder = Math.floor(value / divider);
-      coinsCount = coinsCount + reminder;
-      coinsResult = [...coinsResult, reminder + "x " + divider];
-      reminder = value - divider * reminder;
+      const multiplier = Math.floor(value / divider);
+      coinsCount = coinsCount + multiplier;
+      coinsResult = [...coinsResult, multiplier + "x " + divider];
+      const reminder = value - divider * multiplier;
       if (reminder > 0) value = reminder;
       else if (reminder == 0 && coinsOrdered.length > 0) {
         possibleResults = [...possibleResults, { coinsCount, coinsResult }];
@@ -75,14 +76,14 @@ function App() {
         ) {
           return a.coinsCount < b.coinsCount ? a : b;
         });
+        setResult(
+          smallestCoinCount.coinsCount +
+            " coins: " +
+            smallestCoinCount.coinsResult.join(", ")
+        );
         setDisplayResult(true);
       }
     }
-    setResult(
-      smallestCoinCount.coinsCount +
-        " coins: " +
-        smallestCoinCount.coinsResult.join(", ")
-    );
   }
 
   return (
