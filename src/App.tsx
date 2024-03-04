@@ -12,6 +12,8 @@ function App() {
   const [valueToCalculate, setValueToCalculate] = useState(11);
   let coinsCount = 0;
   let coinsResult: string[] = [];
+  let possibleResults: { coinsCount: number; coinsResult: string[] }[] = [];
+  let smallestCoinCount: { coinsCount: number; coinsResult: string[] };
   const [result, setResult] = useState("");
   let counting = true;
   const [displayResult, setDisplayResult] = useState(false);
@@ -34,37 +36,48 @@ function App() {
     const coinsArr = coins.split(",").map(function (str) {
       return parseInt(str);
     });
-    coinsArr.sort(function (a, b) {
+    const coinsFiltered = coinsArr.filter((coinValue) => coinValue < value);
+    coinsFiltered.sort(function (a, b) {
       return a - b;
     });
-    const coinsOrdered: number[] = coinsArr.reverse();
+    const coinsOrdered: number[] = coinsFiltered.reverse();
     while (counting) {
-      const biggestDivider: number = findBiggestDivider(
-        value,
-        coinsOrdered
-      ) as number;
-      value = divideByBiggestDivider(value, biggestDivider) as number;
+      let divider = 0;
+      for (let i = 0; i < coinsOrdered.length; i++) {
+        if (value >= coinsOrdered[i]) {
+          divider = coinsOrdered[i];
+          break;
+        }
+      }
+      let reminder = value / divider;
+      reminder = Math.floor(reminder);
+      coinsCount = coinsCount + reminder;
+      coinsResult = [...coinsResult, reminder + "x " + divider];
+      reminder = value - divider * reminder;
+      if (reminder > 0) value = reminder;
+      else if (reminder == 0 && coinsOrdered.length > 0) {
+        possibleResults = [...possibleResults, { coinsCount, coinsResult }];
+        coinsOrdered.shift();
+        coinsResult = [];
+        coinsCount = 0;
+        value = valueToCalculate;
+        console.log(coinsOrdered);
+      } else {
+        counting = false;
+        smallestCoinCount = possibleResults.reduce(function (
+          a: { coinsCount: number; coinsResult: string[] },
+          b: { coinsCount: number; coinsResult: string[] }
+        ) {
+          return a.coinsCount < b.coinsCount ? a : b;
+        });
+        setDisplayResult(true);
+      }
     }
-    setResult(coinsCount + " coins: " + coinsResult.join(", "));
-  }
-
-  function findBiggestDivider(value: number, arr: number[]) {
-    for (let i = 0; i < arr.length; i++) {
-      if (value >= arr[i]) return arr[i];
-    }
-  }
-
-  function divideByBiggestDivider(value: number, divider: number) {
-    let reminder = value / divider;
-    reminder = Math.floor(reminder);
-    coinsCount = coinsCount + reminder;
-    coinsResult = [...coinsResult, reminder + "x " + divider];
-    reminder = value - divider * reminder;
-    if (reminder > 0) return reminder;
-    else {
-      counting = false;
-      setDisplayResult(true);
-    }
+    setResult(
+      smallestCoinCount.coinsCount +
+        " coins: " +
+        smallestCoinCount.coinsResult.join(", ")
+    );
   }
 
   return (
@@ -72,7 +85,9 @@ function App() {
       <h1>Coins</h1>
       <div className="card">
         <p>Coins values</p>
-        {coinsProblem && <div className="err">Invalid coins</div>}
+        {coinsProblem && (
+          <div className="err">Invalid coins, use only numbers and ","</div>
+        )}
         <input type="string" value={coins} onChange={updateCoins} />
         <br />
         <p>Value to calculate</p>
