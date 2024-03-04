@@ -12,8 +12,8 @@ function App() {
   const [valueToCalculate, setValueToCalculate] = useState(11);
   let coinsCount = 0;
   let coinsResult: string[] = [];
-  let possibleResults: { coinsCount: number; coinsResult: string[] }[] = [];
-  let smallestCoinCount: { coinsCount: number; coinsResult: string[] };
+  let possibleResults: Result[] = [];
+  let smallestCoinCount: Result;
   const [result, setResult] = useState("");
   let counting = true;
   const [displayResult, setDisplayResult] = useState(false);
@@ -49,8 +49,7 @@ function App() {
           break;
         }
       }
-      let reminder = value / divider;
-      reminder = Math.floor(reminder);
+      let reminder = Math.floor(value / divider);
       coinsCount = coinsCount + reminder;
       coinsResult = [...coinsResult, reminder + "x " + divider];
       reminder = value - divider * reminder;
@@ -64,8 +63,8 @@ function App() {
       } else {
         counting = false;
         smallestCoinCount = possibleResults.reduce(function (
-          a: { coinsCount: number; coinsResult: string[] },
-          b: { coinsCount: number; coinsResult: string[] }
+          a: Result,
+          b: Result
         ) {
           return a.coinsCount < b.coinsCount ? a : b;
         });
@@ -105,6 +104,11 @@ function App() {
       )}
     </>
   );
+}
+
+interface Result {
+  coinsCount: number;
+  coinsResult: string[];
 }
 
 export default App;
