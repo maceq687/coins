@@ -61,7 +61,6 @@ function App() {
         coinsResult = [];
         coinsCount = 0;
         value = valueToCalculate;
-        console.log(coinsOrdered);
       } else {
         counting = false;
         smallestCoinCount = possibleResults.reduce(function (
