@@ -41,7 +41,7 @@ function App() {
     coinsFiltered.sort(function (a, b) {
       return a - b;
     });
-    const coinsOrdered: number[] = coinsFiltered.reverse();
+    const coinsOrdered: number[] = [...new Set<number>(coinsFiltered.reverse())];
     while (counting) {
       let divider = 0;
       if (coinsOrdered.every((el) => el > value)) {
