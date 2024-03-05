@@ -4,12 +4,12 @@ import "./App.css";
 const regexCoins = /^(\d+(,(\d+)*)*)?$/;
 
 function App() {
-  const coinsArr = [3, 2, 5];
+  const coinsArr = [1, 2, 5];
   // 1 5 7 : 10
   // 2 3 5 : 9
   const [coins, setCoins] = useState(coinsArr.join(","));
   const [coinsProblem, setCoinsProblem] = useState(false);
-  const [valueToCalculate, setValueToCalculate] = useState(9);
+  const [valueToCalculate, setValueToCalculate] = useState(11);
   let smallestCoinCount: Result;
   const [result, setResult] = useState("");
   let counting = true;
@@ -41,15 +41,11 @@ function App() {
     coinsFiltered.sort(function (a, b) {
       return a - b;
     });
-    const coinsOrdered: number[] = [...new Set<number>(coinsFiltered.reverse())];
+    const coinsOrdered: number[] = [
+      ...new Set<number>(coinsFiltered.reverse()),
+    ];
     while (counting) {
       let divider = 0;
-      if (coinsOrdered.every((el) => el > value)) {
-        value = value + coinsOrdered[lastIndex];
-        coinsCount = coinsCount - Math.floor(value / coinsOrdered[lastIndex]);
-        coinsResult.pop();
-        coinsOrdered.splice(lastIndex, 1);
-      }
       for (let i = 0; i < coinsOrdered.length; i++) {
         if (value >= coinsOrdered[i]) {
           divider = coinsOrdered[i];
@@ -61,8 +57,18 @@ function App() {
       coinsCount = coinsCount + multiplier;
       coinsResult = [...coinsResult, multiplier + "x " + divider];
       const reminder = value - divider * multiplier;
-      if (reminder > 0) value = reminder;
-      else if (reminder == 0 && coinsOrdered.length > 0) {
+      if (reminder > 0) {
+        value = reminder;
+        if (coinsOrdered.every((el) => el > value)) {
+          value = value + divider;
+          coinsCount = coinsCount - 1;
+          coinsResult.pop();
+          if (multiplier > 1) {
+            coinsResult = [...coinsResult, multiplier - 1 + "x " + divider];
+          }
+          coinsOrdered.splice(lastIndex, 1);
+        }
+      } else if (reminder == 0 && coinsOrdered.length > 0) {
         possibleResults = [...possibleResults, { coinsCount, coinsResult }];
         coinsOrdered.shift();
         coinsResult = [];
