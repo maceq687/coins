@@ -74,7 +74,7 @@ function App() {
         coinsResult = [];
         coinsCount = 0;
         value = valueToCalculate;
-      } else {
+      } else if (coinsOrdered.length == 0 && possibleResults.length > 0) {
         counting = false;
         smallestCoinCount = possibleResults.reduce(function (
           a: Result,
@@ -83,10 +83,15 @@ function App() {
           return a.coinsCount < b.coinsCount ? a : b;
         });
         setResult(
-          smallestCoinCount.coinsCount +
+          "Result: \n" +
+            smallestCoinCount.coinsCount +
             " coins: " +
             smallestCoinCount.coinsResult.join(", ")
         );
+        setDisplayResult(true);
+      } else {
+        counting = false;
+        setResult("No coin combination\nsums up to the given value");
         setDisplayResult(true);
       }
     }
@@ -96,7 +101,7 @@ function App() {
     <>
       <h1>Coins</h1>
       <div className="card">
-        <p>Coins values</p>
+        <p>Coin values</p>
         {coinsProblem && (
           <div className="err">Invalid coins, use only numbers and ","</div>
         )}
@@ -110,12 +115,7 @@ function App() {
         />
       </div>
       <button onClick={calculate}>Run</button>
-      {displayResult && (
-        <p>
-          Result: <br />
-          {result}
-        </p>
-      )}
+      {displayResult && <p style={{ whiteSpace: "pre" }}>{result}</p>}
     </>
   );
 }
